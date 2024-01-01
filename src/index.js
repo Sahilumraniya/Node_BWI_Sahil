@@ -12,7 +12,7 @@ connectDb()
     .then(() => {
         app.listen(PORT, () => {
             console.log(
-                `server is running at port : https://localhost:${PORT}`
+                `server is running at port : http://localhost:${PORT}`
             );
         });
     })

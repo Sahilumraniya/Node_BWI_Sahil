@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import userRouter from "./routes/user.router.js";
 
 const app = express();
 
@@ -12,5 +13,7 @@ app.use(
     })
 );
 app.use(cookieParser());
+
+app.use("/api/v1/user", userRouter);
 
 export default app;
