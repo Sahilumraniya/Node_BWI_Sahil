@@ -7,6 +7,7 @@ import {
     updateUserDeatils,
     deleteUser,
     updatePassword,
+    getUser,
 } from "../controllers/user.controller.js";
 import { authValidation } from "../middlewares/auth.middleware.js";
 
@@ -17,6 +18,7 @@ router.post("/login", login);
 
 //secure route
 router.get("/logout", authValidation, logout);
+router.get("/me", authValidation, getUser);
 router.patch("/update", authValidation, updateUserDeatils);
 router.patch(
     "/update-profile-image",

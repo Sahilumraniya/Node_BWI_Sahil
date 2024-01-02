@@ -1,9 +1,9 @@
-import { User } from "../models/User.model.js";
-import { ApiError } from "../utils/apiError.js";
-import asynchandler from "../utils/asyncHandler.js";
+import { User } from "../models/User.model";
+import { ApiError } from "../utils/apiError";
+import asynchandler from "../utils/asyncHandler";
 import jwt from "jsonwebtoken";
 
-const authValidation = asynchandler(async (req, res, next) => {
+const adminValidation = asynchandler(async (req, res, next) => {
     const accessToken =
         req.cookies?.accessToken ||
         req.header("Authorization")?.replace("Bearer ", "");
@@ -20,13 +20,14 @@ const authValidation = asynchandler(async (req, res, next) => {
     const user = await User.findById(decodedToken._id).select(
         "-password -refreshToken"
     );
-    // console.log("user :: ", user);
-
     if (!user) {
         throw new ApiError(401, "Invaild Access Token");
+    }
+    if (user.role !== "admin") {
+        throw new ApiError(401, "Unauthorized access");
     }
     req.user = user;
     next();
 });
 
-export { authValidation };
+export { adminValidation };

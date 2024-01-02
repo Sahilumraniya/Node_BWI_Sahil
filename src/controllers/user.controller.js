@@ -279,6 +279,19 @@ const updatePassword = asynchandler(async (req, res) => {
     );
 });
 
+const getUser = asynchandler(async (req, res) => {
+    const { user } = req;
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                user: user.toJSON(),
+            },
+            "User fetched successfully"
+        )
+    );
+});
+
 export {
     signup,
     login,
@@ -287,4 +300,5 @@ export {
     updateProfileImage,
     deleteUser,
     updatePassword,
+    getUser,
 };
