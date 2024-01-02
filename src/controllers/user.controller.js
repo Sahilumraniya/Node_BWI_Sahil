@@ -137,4 +137,154 @@ const login = asynchandler(async (req, res) => {
     );
 });
 
-export { signup, login };
+const logout = asynchandler(async (req, res) => {
+    const user = req.user;
+    await User.findByIdAndUpdate(
+        user._id,
+        {
+            $set: {
+                refreshToken: undefined,
+            },
+        },
+        {
+            new: true, // to get updated value of user
+        }
+    );
+
+    const cookieOption = {
+        httpOnly: true,
+        secure: true,
+    };
+
+    res.status(200)
+        .clearCookie("accessToken", cookieOption)
+        .clearCookie("refreshToken", cookieOption)
+        .json(new ApiResponse(200, {}, "user logged out"));
+});
+
+const updateUserDeatils = asynchandler(async (req, res) => {
+    const { username, role } = req.body;
+    const { email, phoneNumber } = req.user;
+    // check if required fields are provided
+    if (username === undefined && role === undefined) {
+        throw new ApiError(400, "Please provide username or role");
+    }
+
+    // check if user already exists
+    const user = await User.findOne({
+        $or: [{ email }, { phoneNumber }],
+    });
+    user.username = username || user.username;
+    user.role = role || user.role;
+    await user.save({ validateBeforeSave: true });
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                user: user.toJSON(),
+            },
+            "User updated successfully"
+        )
+    );
+});
+
+const updateProfileImage = asynchandler(async (req, res) => {
+    const { email, phoneNumber } = req.user;
+    // check if required fields are provided
+    const profileImageLocalPath = req.file?.path;
+
+    if (profileImageLocalPath === undefined) {
+        throw new ApiError(400, "Please provide profile image");
+    }
+
+    // upload profile image on cloudinary
+    const profileImage = await uploadOnCloudinary(profileImageLocalPath);
+
+    // check if user already exists
+    const user = await User.findOne({
+        $or: [{ email }, { phoneNumber }],
+    });
+
+    user.profileImage = profileImage.url;
+    await user.save({ validateBeforeSave: true });
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                user: user.toJSON(),
+            },
+            "User updated successfully"
+        )
+    );
+});
+
+const deleteUser = asynchandler(async (req, res) => {
+    const { email, phoneNumber } = req.user;
+
+    if (!email && !phoneNumber) {
+        throw new ApiError(400, "Please provide email or phone number");
+    }
+
+    User.findOneAndDelete({ $or: [{ email }, { phoneNumber }] })
+        .then((user) => {
+            if (!user) {
+                throw new ApiError(400, "User does not exists");
+            }
+            res.status(200).json(
+                new ApiResponse(
+                    200,
+                    {
+                        user: user.toJSON(),
+                    },
+                    "User deleted successfully"
+                )
+            );
+        })
+        .catch((error) => {
+            console.log("error", error);
+            throw new ApiError(500, "Something went wrong");
+        });
+});
+
+const updatePassword = asynchandler(async (req, res) => {
+    const { email, phoneNumber } = req.user;
+    const { oldPassword, newPassword } = req.body;
+
+    if (!email && !phoneNumber) {
+        throw new ApiError(400, "Please provide email or phone number");
+    }
+
+    if (!oldPassword || !newPassword) {
+        throw new ApiError(400, "Please provide old password and new password");
+    }
+
+    const user = await User.findOne({
+        $or: [{ email }, { phoneNumber }],
+    });
+
+    const isPasswordMatched = await user.comparePassword(oldPassword);
+    if (!isPasswordMatched) {
+        throw new ApiError(400, "Old password is incorrect");
+    }
+    user.password = newPassword;
+    await user.save();
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                user: user.toJSON(),
+            },
+            "Password updated successfully"
+        )
+    );
+});
+
+export {
+    signup,
+    login,
+    logout,
+    updateUserDeatils,
+    updateProfileImage,
+    deleteUser,
+    updatePassword,
+};
