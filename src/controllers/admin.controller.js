@@ -2,7 +2,11 @@ import { User } from "../models/User.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiRespones.js";
 import asynchandler from "../utils/asyncHandler.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import {
+    uploadOnCloudinary,
+    deleteFromCloudinary,
+    deleteAllFromCloudinary,
+} from "../utils/cloudinary.js";
 
 const getAllUsers = asynchandler(async (req, res) => {
     const users = await User.find().select("-password -refreshToken");
@@ -47,9 +51,9 @@ const updateProfileImage = asynchandler(async (req, res) => {
 
     // upload profile image on cloudinary
     const profileImage = await uploadOnCloudinary(profileImageLocalPath);
-
     // check if user already exists
     const user = await User.findById(userId);
+    await deleteFromCloudinary(user.profileImage);
 
     user.profileImage = profileImage.url;
     await user.save({ validateBeforeSave: true });
@@ -70,11 +74,13 @@ const deleteUser = asynchandler(async (req, res) => {
     if (!user) {
         throw new ApiError(404, "User not found");
     }
-    await user.remove();
+    await deleteFromCloudinary(user.profileImage);
+    await User.findByIdAndDelete(userId);
     res.status(200).json(new ApiResponse(200, "User deleted successfully"));
 });
 
 const deleteAllUsers = asynchandler(async (req, res) => {
+    await deleteAllFromCloudinary();
     await User.deleteMany();
     res.status(200).json(new ApiResponse(200, "Users deleted successfully"));
 });

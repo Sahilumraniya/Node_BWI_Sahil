@@ -1,6 +1,6 @@
-import { User } from "../models/User.model";
-import { ApiError } from "../utils/apiError";
-import asynchandler from "../utils/asyncHandler";
+import { User } from "../models/User.model.js";
+import { ApiError } from "../utils/apiError.js";
+import asynchandler from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
 
 const adminValidation = asynchandler(async (req, res, next) => {
@@ -17,7 +17,7 @@ const adminValidation = asynchandler(async (req, res, next) => {
         process.env.ACCESS_TOKEN_SECRET
     );
     // console.log("decodedToken :: ", decodedToken);
-    const user = await User.findById(decodedToken._id).select(
+    const user = await User.findById(decodedToken.id).select(
         "-password -refreshToken"
     );
     if (!user) {

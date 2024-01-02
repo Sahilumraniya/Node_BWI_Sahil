@@ -8,6 +8,7 @@ import {
     deleteUser,
     updatePassword,
     getUser,
+    updateProfileImage,
 } from "../controllers/user.controller.js";
 import { authValidation } from "../middlewares/auth.middleware.js";
 
@@ -24,7 +25,7 @@ router.patch(
     "/update-profile-image",
     authValidation,
     upload.single("profileImage"),
-    updateUserDeatils
+    updateProfileImage
 );
 router.patch("/update-password", authValidation, updatePassword);
 router.delete("/delete", authValidation, deleteUser);

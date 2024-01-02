@@ -17,13 +17,13 @@ const authValidation = asynchandler(async (req, res, next) => {
         process.env.ACCESS_TOKEN_SECRET
     );
     // console.log("decodedToken :: ", decodedToken);
-    const user = await User.findById(decodedToken._id).select(
+    const user = await User.findById(decodedToken.id).select(
         "-password -refreshToken"
     );
     // console.log("user :: ", user);
 
     if (!user) {
-        throw new ApiError(401, "Invaild Access Token");
+        throw new ApiError(401, "Middleware::Invaild Access Token");
     }
     req.user = user;
     next();

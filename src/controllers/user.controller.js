@@ -2,7 +2,10 @@ import { User } from "../models/User.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiRespones.js";
 import asynchandler from "../utils/asyncHandler.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import {
+    deleteFromCloudinary,
+    uploadOnCloudinary,
+} from "../utils/cloudinary.js";
 
 const generateAccessAndRefereshToken = async (userId) => {
     try {
@@ -200,6 +203,8 @@ const updateProfileImage = asynchandler(async (req, res) => {
     // upload profile image on cloudinary
     const profileImage = await uploadOnCloudinary(profileImageLocalPath);
 
+    await deleteFromCloudinary(req.user.profileImage);
+
     // check if user already exists
     const user = await User.findOne({
         $or: [{ email }, { phoneNumber }],
@@ -219,17 +224,24 @@ const updateProfileImage = asynchandler(async (req, res) => {
 });
 
 const deleteUser = asynchandler(async (req, res) => {
-    const { email, phoneNumber } = req.user;
+    const { email, phoneNumber, profileImage } = req.user;
 
     if (!email && !phoneNumber) {
         throw new ApiError(400, "Please provide email or phone number");
     }
-
+    await deleteFromCloudinary(profileImage);
     User.findOneAndDelete({ $or: [{ email }, { phoneNumber }] })
         .then((user) => {
             if (!user) {
                 throw new ApiError(400, "User does not exists");
             }
+            //clear cookies
+            const cookieOption = {
+                httpOnly: true,
+                secure: true,
+            };
+            res.cookie.clearCookie("accessToken", cookieOption);
+            res.cookie.clearCookie("refreshToken", cookieOption);
             res.status(200).json(
                 new ApiResponse(
                     200,

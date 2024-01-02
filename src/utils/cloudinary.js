@@ -30,7 +30,7 @@ const deleteFromCloudinary = async (cloudinaryUrl) => {
     try {
         if (!cloudinaryUrl) return;
         const publicId = cloudinaryUrl.split("/")[7].split(".")[0];
-        const res = await cloudinary.uploader.delete_resources(publicId);
+        const res = await cloudinary.api.delete_resources(publicId);
         if (!res) {
             throw new Error("Cloudinary delete failed");
         }
@@ -40,4 +40,16 @@ const deleteFromCloudinary = async (cloudinaryUrl) => {
     }
 };
 
-export { uploadOnCloudinary, deleteFromCloudinary };
+const deleteAllFromCloudinary = async () => {
+    try {
+        const res = await cloudinary.api.delete_all_resources();
+        if (!res) {
+            throw new Error("Cloudinary delete failed");
+        }
+        return res;
+    } catch (error) {
+        console.log("Faild to delete file on cloudinary", error);
+    }
+};
+
+export { uploadOnCloudinary, deleteFromCloudinary, deleteAllFromCloudinary };

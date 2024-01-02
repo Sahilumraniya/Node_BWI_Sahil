@@ -7,12 +7,13 @@ import {
     deleteAllUsers,
 } from "../controllers/admin.controller.js";
 import { adminValidation } from "../middlewares/admin.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
 router.get("/getAllUser", adminValidation, getAllUsers);
-router.post("/updateUser/:userId", adminValidation, updateUser);
-router.post(
+router.patch("/updateUser/:userId", adminValidation, updateUser);
+router.patch(
     "/updateProfileImage/:userId",
     adminValidation,
     upload.single("profileImage"),
