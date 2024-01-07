@@ -1,4 +1,4 @@
-# Project Name
+# Node.js API for User Management
 
 ## Description
 
@@ -6,18 +6,15 @@ This is a Node.js API for user management. It allows users to register, login, a
 
 ## Table of Contents
 
--   User Management
--   Roles and Access Control
--   Admin Management
--   Authentication and Security
--   Image Storage
--   Database and Framework
--   Data Validation
--   Project Structure
--   How to Use
--   Dependencies
--   Contributing
--   License
+-   [User Management](#user-management)
+-   [Admin Management](#admin-management)
+-   [End Points](#end-points)
+-   [Authentication and Security](#authentication-and-security)
+-   [Image Storage](#image-storage)
+-   [Database and Framework](#database-and-framework)
+-   [Data Validation](#data-validation)
+-   [Project Structure](#project-structure)
+-   [How to Use](#how-to-use)
 
 ## User Management
 
@@ -60,12 +57,15 @@ This is a Node.js API for user management. It allows users to register, login, a
 
 ## Image Storage
 
--   Save profile images in the local system or integrate with cloudinary service.
+-   Save profile images in the local system for temporary use and integrate with cloudinary service to save.
 
 ## Database and Framework
 
 -   Utilize Express.js for API development.
--   Use MongoDB as the database.
+-   Use Mongoose to create models, connect to the database, and perform CRUD operations.
+-   Use MongoDB Atlas for cloud database.
+-   Use Multer for image upload.
+-   Use Cloudinary for image storage.
 
 ## Data Validation
 
@@ -73,14 +73,15 @@ This is a Node.js API for user management. It allows users to register, login, a
 
 ## Project Structure
 
--   `/controllers`: Contains controllers for handling different functionalities.
--   `/middlewares`: Includes middleware functions for authentication and validation.
--   `/models`: Defines database models (User, Admin).
--   `/routes`: Defines API routes for users and admins.
--   `/services`: Contains service functions for business logic.
--   `/utils`: Utility functions for encryption and validation.
--   `server.js`: Main entry point for the application.
--   `config.js`: Configuration file for database and other settings.
+-   `/public`: Contains static files (images).
+-   `/src/controllers`: Contains controllers for handling different functionalities.
+-   `/src/middlewares`: Includes middleware functions for authentication and validation.
+-   `/src/models`: Defines database models (User, Admin).
+-   `/scr/db` : Contains database connection file
+-   `/src/routes`: Defines API routes for users and admins.
+-   `/src/utils`: Utility functions for encryption and validation.
+-   `/src/index.js`: Main entry point for the application.
+-   `/src/app.js` : express app configuration file
 
 ## How to Use
 
